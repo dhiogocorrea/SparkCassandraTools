@@ -57,11 +57,11 @@
             <version>1.6.0-M1</version>
         </dependency>
         
-        <dependency>
+        <!--<dependency>
             <groupId>com.databricks</groupId>
             <artifactId>spark-csv_2.10</artifactId>
             <version>1.4.0</version>
-        </dependency>
+        </dependency> -->
 
     </dependencies>
     
@@ -162,14 +162,7 @@
                                 <exclude>com.google.common.base.Present</exclude>
                             </excludes>
                         </relocation>
-                        
-                        <relocation>
-                        <pattern>com.databricks</pattern>
-                        <shadedPattern>shaded.spark-csv_2.10</shadedPattern>
-                        <includes>
-                        <include>com.databricks.**</include>
-                        </includes>
-                        </relocation>
+
                     </relocations>
 
                     <filters>

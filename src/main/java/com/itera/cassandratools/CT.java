@@ -8,18 +8,21 @@ public class CT {
     public static void main(String[] args) {
         long tempoInicio = System.currentTimeMillis();
 
-        if (args.length == 0) {
-            System.exit(0);
-        }
-
         String jarLocation = "/home/dcorrea/jars/SCT.jar";
 
         String sparkHost = "yarn-client";
         String appName = "SCTAPP";
-        String cassandraHost = "10.244.203.23";
+        String cassandraHost = "10.244.203.22";
         String cassandraUsername = "bradesco";
         String cassandraPassword = "brades01";
         String keyspace = "itera_miner";
+        
+//        String sparkHost = "local";
+//        String appName = "SCTAPP";
+//        String cassandraHost = "192.168.21.253";
+//        String cassandraUsername = "itera";
+//        String cassandraPassword = "itera2101@";
+//        String keyspace = "itera";
 
         String tableName = "event_cc";
         String fields = "";
@@ -36,9 +39,12 @@ public class CT {
         String amountColumnName = "event_amt";
 
         String categoryColumnName = "category";
-        
+
+        String userIdColumnName = "id";
+        String financialInstitutionColumnName = "financial_institution";
+
         String outputTable = "";
-        
+
         String columnToFilter = "";
         String[] filter = null;
 
@@ -53,8 +59,7 @@ public class CT {
                     if (parameters.length == 3) {
                         jarLocation = parameters[1] + ":" + parameters[2];
                     } else if (parameters.length == 4) {
-                        jarLocation = parameters[1] + ":" + parameters[2]
-                                + ":" + parameters[3];
+                        jarLocation = parameters[1] + ":" + parameters[2] + ":" + parameters[3];
                     } else {
                         jarLocation = parameters[1];
                     }
@@ -63,8 +68,7 @@ public class CT {
                     if (parameters.length == 3) {
                         sparkHost = parameters[1] + ":" + parameters[2];
                     } else if (parameters.length == 4) {
-                        sparkHost = parameters[1] + ":" + parameters[2]
-                                + ":" + parameters[3];
+                        sparkHost = parameters[1] + ":" + parameters[2] + ":" + parameters[3];
                     } else {
                         sparkHost = parameters[1];
                     }
@@ -177,17 +181,32 @@ public class CT {
                 case "filter":
                     filter = parameters[1].split(",");
                     break;
-                    case "outputTable":
+                case "outputTable":
                     if (parameters.length == 3) {
                         outputTable = parameters[1] + ":" + parameters[2];
                     } else {
                         outputTable = parameters[1];
                     }
                     break;
+                case "financialInstitutionColumnName":
+                    if (parameters.length == 3) {
+                        financialInstitutionColumnName = parameters[1] + ":" + parameters[2];
+                    } else {
+                        financialInstitutionColumnName = parameters[1];
+                    }
+                    break;
+                case "userIdColumnName":
+                    if (parameters.length == 3) {
+                        userIdColumnName = parameters[1] + ":" + parameters[2];
+                    } else {
+                        userIdColumnName = parameters[1];
+                    }
+                    break;
             }
         }
 
-        SparkConfiguration.configureContext(jarLocation, sparkHost, appName, cassandraHost, cassandraUsername, cassandraPassword, keyspace);
+        SparkConfiguration.configureContext(jarLocation, sparkHost, appName, cassandraHost, cassandraUsername,
+                cassandraPassword, keyspace);
         CassandraRegistersHandler crh = new CassandraRegistersHandler(tableName, fields, whereClause, limit);
 
         switch (typeProcessing) {
@@ -197,13 +216,12 @@ public class CT {
             case "saveToLocal":
                 crh.saveToLocal(idColumnName, textColumnName, output);
                 break;
-            case "regraPareto":
-        {
-            crh.regraPareto(textColumnName, amountColumnName, categoryColumnName, output, outputTable);
-        }
-                break;
+            case "regraPareto": {
+                crh.reportPareto(textColumnName, amountColumnName, categoryColumnName, financialInstitutionColumnName, userIdColumnName, output, outputTable, true);
+            }
+            break;
             case "dataInformation":
-                crh.getData(columnToFilter, filter, output);
+                crh.getData(columnToFilter, filter, outputTable, output);
                 break;
         }
 

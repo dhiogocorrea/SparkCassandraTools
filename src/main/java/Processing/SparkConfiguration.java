@@ -21,9 +21,9 @@ public abstract class SparkConfiguration implements Serializable{
                 .set("spark.cassandra.auth.username", cassandraUsername)
                 .set("spark.cassandra.auth.password", cassandraPassword);
 
-        String[] jars = new String[2];
+        String[] jars = new String[1];
         jars[0] = jarLocation;
-        jars[1] = "/home/dcorrea/jars/spark-csv_2.10-1.4.0.jar";
+        
         Class[] classes = new Class[3];
         classes[0] = CassandraRegistersHandler.class;
         classes[1] = CountPattern.class;

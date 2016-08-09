@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.itera.cassandratools.CT typeProcessing:regraPareto sparkHost:local appName:countApp cassandraHost:192.168.21.253 cassandraUsername:itera cassandraPassword:itera2101@ keyspace:itera tableName:event_cc idColumnName:row_id textColumnName:rsegda_lin_extrt amountColumnName:event_amt outputTable:event_cc_seg_lin userIdColumnName:id userId:11111475 categoryColumnName:category</exec.args>
+                <exec.args>-classpath %classpath com.itera.cassandratools.CT typeProcessing:dataInformation columnToFilter:id filter:7734998 outputTable:event_cc_user</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath com.itera.cassandratools.CT typeProcessing:regraPareto sparkHost:local appName:countApp cassandraHost:192.168.21.253 cassandraUsername:itera cassandraPassword:itera2101@ keyspace:itera tableName:event_cc idColumnName:row_id textColumnName:rsegda_lin_extrt amountColumnName:event_amt outputTable:event_cc_seg_lin userIdColumnName:id userId:11111475 categoryColumnName:category</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath com.itera.cassandratools.CT typeProcessing:dataInformation columnToFilter:id filter:7734998 outputTable:event_cc_user</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.itera.cassandratools.CT typeProcessing:regraPareto sparkHost:local appName:countApp cassandraHost:192.168.21.253 cassandraUsername:itera cassandraPassword:itera2101@ keyspace:itera tableName:event_cc idColumnName:row_id textColumnName:rsegda_lin_extrt amountColumnName:event_amt outputTable:event_cc_seg_lin userIdColumnName:id userId:11111475 categoryColumnName:category</exec.args>
+                <exec.args>-classpath %classpath com.itera.cassandratools.CT typeProcessing:dataInformation columnToFilter:id filter:7734998 outputTable:event_cc_user</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
