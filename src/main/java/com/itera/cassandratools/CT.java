@@ -16,14 +16,14 @@ public class CT {
         String cassandraUsername = "bradesco";
         String cassandraPassword = "brades01";
         String keyspace = "itera_miner";
-        
+
 //        String sparkHost = "local";
 //        String appName = "SCTAPP";
 //        String cassandraHost = "192.168.21.253";
 //        String cassandraUsername = "itera";
 //        String cassandraPassword = "itera2101@";
 //        String keyspace = "itera";
-
+        
         String tableName = "event_cc";
         String fields = "";
         String whereClause = "";
@@ -47,6 +47,8 @@ public class CT {
 
         String columnToFilter = "";
         String[] filter = null;
+
+        String filter_type = "in";
 
         for (String parameter : args) {
             parameter = parameter.replace("\\", "/");
@@ -202,6 +204,13 @@ public class CT {
                         userIdColumnName = parameters[1];
                     }
                     break;
+                case "filter_type":
+                    if (parameters.length == 3) {
+                        filter_type = parameters[1] + ":" + parameters[2];
+                    } else {
+                        filter_type = parameters[1];
+                    }
+                    break;
             }
         }
 
@@ -221,7 +230,7 @@ public class CT {
             }
             break;
             case "dataInformation":
-                crh.getData(columnToFilter, filter, outputTable, output);
+                crh.getData(columnToFilter, filter_type, filter, outputTable, output, textColumnName);
                 break;
         }
 

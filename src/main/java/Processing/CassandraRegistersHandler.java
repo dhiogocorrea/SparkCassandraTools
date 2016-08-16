@@ -247,8 +247,20 @@ public class CassandraRegistersHandler implements Serializable {
         }*/
     }
 
-    public void getData(String columnToFilter, String[] filter, String outputTable, String outputPath) {
-        df = df.filter(col(columnToFilter).in(filter));
+    public void getData(String columnToFilter, String filter_type, String[] filter, String outputTable, String outputPath, String textColumnName) {
+        
+        if (filter_type.equals("in"))
+            df = df.filter(col(columnToFilter).in(filter));
+        else if (filter_type.equals("greater")){
+            Double filterDouble = Double.parseDouble(filter[0]);
+            
+            df = df.filter(col(columnToFilter).gt(filterDouble));
+        } else if (filter_type.equals("between")){
+            Double filterDouble1 = Double.parseDouble(filter[0]);
+            Double filterDouble2 = Double.parseDouble(filter[1]);
+            
+            df = df.filter(col(columnToFilter).between(filterDouble1, filterDouble2));
+        }
 
         if (!outputTable.isEmpty()){
             System.out.println("Saving result to cassandra...");
@@ -265,6 +277,7 @@ public class CassandraRegistersHandler implements Serializable {
                 .option("header", "true")
                 .save(outputPath);*/
     }
+
 
     private static String clean(String str) {
         String allowed = "aáãàâbcçdeéêfghiíjklmnoóôõpqrstuúüvwxyz_";
