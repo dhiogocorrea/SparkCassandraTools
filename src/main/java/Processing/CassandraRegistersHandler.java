@@ -26,6 +26,7 @@ import scala.Tuple4;
 
 import org.apache.spark.serializer.KryoRegistrator;
 import org.apache.spark.sql.SaveMode;
+import scala.Tuple5;
 
 public class CassandraRegistersHandler implements Serializable {
 
@@ -60,18 +61,19 @@ public class CassandraRegistersHandler implements Serializable {
         df = SparkConfiguration.sqlContext.cassandraSql(query);
     }
 
-    public void countRegisters(final String columnToFilter, final String amountColumnName, final String idColumnName, final String categoryColumnName, String outputTable) {
+    public void countRegisters(final String columnToFilter, final String amountColumnName, final String idColumnName, final String categoryColumnName, final String categoryPercentualColumnName, String outputTable) {
         if (!columnToFilter.isEmpty()) {
             //df = df.groupBy(columnToFilter).agg(lit(0));
             
         	df = df.filter(col(idColumnName).isNotNull()).filter(col(amountColumnName).isNotNull()).filter(col(columnToFilter).isNotNull());
-        	
+                
         	Tuple4<Integer, Double, Integer, Double> total = df.javaRDD().map(new Function<Row, Tuple4<Integer,Double,Integer, Double>>(){
 
 				@Override
 				public Tuple4<Integer, Double, Integer, Double> call(Row t) throws Exception {
 					Double amount = t.getAs(t.fieldIndex(amountColumnName));
 					String category = t.getAs(t.fieldIndex(categoryColumnName));
+                                        
 					Integer isIndefinido = category.equals("INDEFINIDO") ? 1 : 0;
 					
                                         Double amount_indefinido = category.equals("INDEFINIDO") ? amount : 0;
@@ -109,10 +111,10 @@ public class CassandraRegistersHandler implements Serializable {
                                 "\nTotal de registros categorizados: " + (total_count - total_indefinidos) +
                                 "\nTotal em valor de registros categorizados: " + (total_amount - total_amount_indefinidos));
         	
-            JavaPairRDD<String,Tuple4<Integer,Double,String, String>> rdd = df.javaRDD().mapToPair(new PairFunction<Row, String, Tuple4<Integer,Double,String,String>>(){
+            JavaPairRDD<String,Tuple5<Integer,Double,String, String,Integer>> rdd = df.javaRDD().mapToPair(new PairFunction<Row, String, Tuple5<Integer,Double,String, String,Integer>>(){
 
 				@Override
-				public Tuple2<String, Tuple4<Integer,Double,String,String>> call(Row t) throws Exception {
+				public Tuple2<String, Tuple5<Integer,Double,String, String,Integer>> call(Row t) throws Exception {
 					Object obj = t.get(t.fieldIndex(columnToFilter));
 					String text = obj.toString();
 					
@@ -123,18 +125,31 @@ public class CassandraRegistersHandler implements Serializable {
 					String category = t.getAs(t.fieldIndex(categoryColumnName));
 					text = clean(text);
 					
-					return new Tuple2<>(text, new Tuple4<>(1,amount,row_id.toString(), category));
+                                        Double category_percentual = t.getAs(t.fieldIndex(categoryPercentualColumnName));
+                                        
+                                        Integer category_percentual_quartil = 0;
+                                        
+                                        if (category_percentual > 0 && category_percentual <= 25)
+                                            category_percentual_quartil = 1;
+                                        else if (category_percentual > 25 && category_percentual <= 50)
+                                            category_percentual_quartil = 2;
+                                        else if (category_percentual > 50 && category_percentual <= 75)
+                                            category_percentual_quartil = 3;
+                                        else if (category_percentual > 75 && category_percentual <= 100)
+                                            category_percentual_quartil = 4;
+                                        
+					return new Tuple2<>(text, new Tuple5<>(1,amount,row_id.toString(), category,category_percentual_quartil));
 				}
             	
             });
             
-            JavaPairRDD<String, Tuple4<Integer, Double, String, String>> reducedRDD = rdd.reduceByKey(new Function2<Tuple4<Integer,Double,String, String>,Tuple4<Integer,Double,String, String>,Tuple4<Integer,Double,String, String>>(){
+            JavaPairRDD<String, Tuple5<Integer,Double,String, String,Integer>> reducedRDD = rdd.reduceByKey(new Function2<Tuple5<Integer,Double,String, String,Integer>,Tuple5<Integer,Double,String, String,Integer>,Tuple5<Integer,Double,String, String,Integer>>(){
 
 				@Override
-				public Tuple4<Integer, Double, String, String> call(Tuple4<Integer, Double, String, String> v1,
-						Tuple4<Integer, Double, String, String> v2) throws Exception {
+				public Tuple5<Integer,Double,String, String,Integer> call(Tuple5<Integer,Double,String, String,Integer> v1,
+						Tuple5<Integer,Double,String, String,Integer> v2) throws Exception {
 					
-					return new Tuple4<>(v1._1() + v2._1(), v1._2() + v2._2(), v1._3() + "|" + v2._3(), v1._4());
+					return new Tuple5<>(v1._1() + v2._1(), v1._2() + v2._2(), v1._3() + "|" + v2._3(), v1._4(), v1._5());
 				}
             	
             });
@@ -144,11 +159,12 @@ public class CassandraRegistersHandler implements Serializable {
             System.out.println("Total de registros unicos: " + total_count_unicos);
             
             
-            JavaRDD<SegLinPattern> resultRDD = reducedRDD.map(new Function<Tuple2<String, Tuple4<Integer,Double,String, String>>, SegLinPattern>(){
+            JavaRDD<SegLinPattern> resultRDD = reducedRDD.map(new Function<Tuple2<String, Tuple5<Integer,Double,String, String,Integer>>, SegLinPattern>(){
 
 				@Override
-				public SegLinPattern call(Tuple2<String, Tuple4<Integer, Double, String, String>> v1) throws Exception {
-					
+				public SegLinPattern call(Tuple2<String, Tuple5<Integer,Double,String, String,Integer>> v1) throws Exception {
+					String text = v1._1();
+                                        
 					Integer count = v1._2()._1();
 					Double amount = v1._2()._2();
 					
@@ -161,13 +177,21 @@ public class CassandraRegistersHandler implements Serializable {
 					BigDecimal bd2 = new BigDecimal(percentual_amount);
 					bd2.setScale(2, RoundingMode.HALF_UP);
 					
-					return new SegLinPattern(v1._1(), v1._2()._1(), v1._2()._2(), v1._2()._3(), v1._2()._4(), bd1.doubleValue(), bd2.doubleValue());
+                                        if (text.isEmpty()){
+                                            return new SegLinPattern("", v1._2()._1(), v1._2()._2(), v1._2()._3(), v1._2()._4(), bd1.doubleValue(), bd2.doubleValue(), v1._2()._5());
+                                        } else {
+                                            return new SegLinPattern(v1._1(), v1._2()._1(), v1._2()._2(), v1._2()._3(), v1._2()._4(), bd1.doubleValue(), bd2.doubleValue(), v1._2()._5());
+                                        }
+					
 				}
             	
             });
             
             DataFrame finalDF = SparkConfiguration.sqlContext.createDataFrame(resultRDD, SegLinPattern.class);
             
+            finalDF = finalDF.filter(col("rsegda_lin_extrt").notEqual(""));
+            
+            finalDF.show();
             
             if (!outputTable.isEmpty()){
                 System.out.println("Saving result to cassandra...");

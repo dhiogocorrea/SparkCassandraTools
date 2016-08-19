@@ -10,27 +10,19 @@ public class CT {
 
         String jarLocation = "/home/dcorrea/jars/SCT.jar";
 
-       String sparkHost = "yarn-client";
+        String sparkHost = "local";
         String appName = "SCTAPP";
-        String cassandraHost = "10.244.203.22";
-        String cassandraUsername = "bradesco";
-        String cassandraPassword = "brades01";
-        String keyspace = "itera_miner";
+        String cassandraHost = "192.168.21.253";
+        String cassandraUsername = "itera";
+        String cassandraPassword = "itera2101@";
+        String keyspace = "itera";
 
-//        String sparkHost = "local";
-//        String appName = "SCTAPP";
-//        String cassandraHost = "192.168.21.253";
-//        String cassandraUsername = "itera";
-//        String cassandraPassword = "itera2101@";
-//        String keyspace = "itera";
-        
 //      String sparkHost = "local";
 //      String appName = "SCTAPP";
 //      String cassandraHost = "127.0.0.1";
 //      String cassandraUsername = "itera";
 //      String cassandraPassword = "itera2101@";
 //      String keyspace = "itera_miner";
-        
         String tableName = "event_cc";
         String fields = "";
         String whereClause = "";
@@ -56,6 +48,8 @@ public class CT {
         String[] filter = null;
 
         String filter_type = "in";
+
+        String categoryPercentualColumnName = "category_percentual";
 
         for (String parameter : args) {
             parameter = parameter.replace("\\", "/");
@@ -218,6 +212,15 @@ public class CT {
                         filter_type = parameters[1];
                     }
                     break;
+                case "categoryPercentualColumnName":
+                    if (parameters.length == 3) {
+                        categoryPercentualColumnName = parameters[1] + ":" + parameters[2];
+                    } else if (parameters.length == 4) {
+                        categoryPercentualColumnName = parameters[1] + ":" + parameters[2] + ":" + parameters[3];
+                    } else {
+                        categoryPercentualColumnName = parameters[1];
+                    }
+                    break;
             }
         }
 
@@ -227,7 +230,7 @@ public class CT {
 
         switch (typeProcessing) {
             case "countRegisters":
-                crh.countRegisters(columnToFilter, amountColumnName, idColumnName, categoryColumnName, outputTable);
+                crh.countRegisters(columnToFilter, amountColumnName, idColumnName, categoryColumnName, categoryPercentualColumnName, outputTable);
                 break;
             case "saveToLocal":
                 crh.saveToLocal(idColumnName, textColumnName, output);
