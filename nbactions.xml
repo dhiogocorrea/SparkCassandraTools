@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.itera.cassandratools.CT</exec.args>
+                <exec.args>-classpath %classpath com.itera.cassandratools.CT typeProcessing:dataInformation columnToFilter:category_percentual filter:80 filter_type:greater outputTable:event_cc_best_conf</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath com.itera.cassandratools.CT</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath com.itera.cassandratools.CT typeProcessing:dataInformation columnToFilter:category_percentual filter:80 filter_type:greater outputTable:event_cc_best_conf</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.itera.cassandratools.CT</exec.args>
+                <exec.args>-classpath %classpath com.itera.cassandratools.CT typeProcessing:dataInformation columnToFilter:category_percentual filter:80 filter_type:greater outputTable:event_cc_best_conf</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

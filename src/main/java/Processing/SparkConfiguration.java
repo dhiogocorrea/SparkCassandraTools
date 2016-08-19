@@ -1,14 +1,15 @@
 package Processing;
 
 import java.io.Serializable;
-
+import java.util.Arrays;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.cassandra.CassandraSQLContext;
 
-public abstract class SparkConfiguration implements Serializable {
 
-	public transient static JavaSparkContext sc;
+public abstract class SparkConfiguration implements Serializable{
+
+    public transient static JavaSparkContext sc;
     public static CassandraSQLContext sqlContext;
     
     public static void configureContext(String jarLocation, String sparkHost, String appName, String cassandraHost, String cassandraUsername,
@@ -38,3 +39,4 @@ public abstract class SparkConfiguration implements Serializable {
         sqlContext.setKeyspace(keyspace);
     }
 }
+
