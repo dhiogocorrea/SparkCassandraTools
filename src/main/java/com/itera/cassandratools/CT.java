@@ -10,6 +10,13 @@ public class CT {
 
         String jarLocation = "/home/dcorrea/jars/SCT.jar";
 
+//        String sparkHost = "yarn-client";
+//        String appName = "PTCTAPP";
+//        String cassandraHost = "10.244.203.22";
+//        String cassandraUsername = "bradesco";
+//        String cassandraPassword = "brades01";
+//        String keyspace = "itera_miner";
+
         String sparkHost = "local";
         String appName = "SCTAPP";
         String cassandraHost = "192.168.21.253";
@@ -23,6 +30,7 @@ public class CT {
 //      String cassandraUsername = "itera";
 //      String cassandraPassword = "itera2101@";
 //      String keyspace = "itera_miner";
+
         String tableName = "event_cc";
         String fields = "";
         String whereClause = "";
@@ -51,6 +59,8 @@ public class CT {
 
         String categoryPercentualColumnName = "category_percentual";
 
+        String dateColumnName = "event_start_dt";
+        
         for (String parameter : args) {
             parameter = parameter.replace("\\", "/");
             String[] parameters = parameter.split(":");
@@ -230,7 +240,7 @@ public class CT {
 
         switch (typeProcessing) {
             case "countRegisters":
-                crh.countRegisters(columnToFilter, amountColumnName, idColumnName, categoryColumnName, categoryPercentualColumnName, outputTable);
+                crh.countRegisters(columnToFilter, amountColumnName, idColumnName, categoryColumnName, categoryPercentualColumnName, dateColumnName, outputTable);
                 break;
             case "saveToLocal":
                 crh.saveToLocal(idColumnName, textColumnName, output);
