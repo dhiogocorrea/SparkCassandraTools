@@ -10,19 +10,19 @@ public class CT {
 
         String jarLocation = "/home/dcorrea/jars/SCT.jar";
 
-//        String sparkHost = "yarn-client";
-//        String appName = "PTCTAPP";
-//        String cassandraHost = "10.244.203.22";
-//        String cassandraUsername = "bradesco";
-//        String cassandraPassword = "brades01";
-//        String keyspace = "itera_miner";
-
-        String sparkHost = "local";
-        String appName = "SCTAPP";
-        String cassandraHost = "192.168.21.253";
-        String cassandraUsername = "itera";
-        String cassandraPassword = "itera2101@";
-        String keyspace = "itera";
+        String sparkHost = "yarn-client";
+        String appName = "PTCTAPP";
+        String cassandraHost = "10.244.203.22";
+        String cassandraUsername = "bradesco";
+        String cassandraPassword = "brades01";
+        String keyspace = "itera_miner";
+//
+//        String sparkHost = "local";
+//        String appName = "SCTAPP";
+//        String cassandraHost = "192.168.21.253";
+//        String cassandraUsername = "itera";
+//        String cassandraPassword = "itera2101@";
+//        String keyspace = "itera";
 
 //      String sparkHost = "local";
 //      String appName = "SCTAPP";
