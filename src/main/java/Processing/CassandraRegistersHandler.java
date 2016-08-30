@@ -258,89 +258,89 @@ public class CassandraRegistersHandler implements Serializable {
 
                 finalDF.write().format("org.apache.spark.sql.cassandra").options(mapOptions).mode(SaveMode.Append).save();
 
-                Double num20perc_double = total_count_unicos * 0.2;
-
-                BigDecimal bd = new BigDecimal(num20perc_double);
-                bd.setScale(1, RoundingMode.UP);
-
-                Double d = Math.ceil(bd.doubleValue());
-
-                Integer num20_perc = d.intValue();
-
-                DataFrame df_amount = finalDF.orderBy(desc("percentual_amount"))
-                        .limit(num20_perc).withColumn("pareto_amount", lit(1));
-
-                DataFrame df_count = finalDF.orderBy(desc("percentual_count"))
-                        .limit(num20_perc).withColumn("pareto_count", lit(1));
-
-                df_amount.write().format("org.apache.spark.sql.cassandra").options(mapOptions).mode(SaveMode.Append).save();
-                df_count.write().format("org.apache.spark.sql.cassandra").options(mapOptions).mode(SaveMode.Append).save();
-                
-                Tuple3<Double, Integer, Integer> dados_pareto_amount = df_amount.javaRDD().map(new Function<Row, Tuple3<Double, Integer, Integer>>() {
-                    @Override
-                    public Tuple3<Double, Integer, Integer> call(Row t1) throws Exception {
-                        String category = t1.getAs(t1.fieldIndex(categoryColumnName));
-                        Double amount = t1.getAs("amount");
-                        Integer num_cat = 0;
-                        Integer num_indef = 0;
-
-                        if ("INDEFINIDO".equals(category)) {
-                            num_indef++;
-                                    
-                        } else {
-                            num_cat++;
-                        }
-
-                        return new Tuple3<>(amount, num_cat, num_indef);
-                    }
-                }).reduce(new Function2<Tuple3<Double,Integer,Integer>, Tuple3<Double,Integer,Integer>,Tuple3<Double,Integer,Integer>>(){
-                    @Override
-                    public Tuple3<Double, Integer, Integer> call(Tuple3<Double, Integer, Integer> t1, Tuple3<Double, Integer, Integer> t2) throws Exception {
-                        Double amountTotal = t1._1() + t2._1();
-                        Integer num_cat = t1._2() + t2._2();
-                        Integer num_indef = t1._3() + t2._3();
-                        
-                        return new Tuple3<>(amountTotal,num_cat,num_indef);
-                    }
-                });
-
-                Tuple3<Double, Integer, Integer> dados_pareto_count = df_count.javaRDD().map(new Function<Row, Tuple3<Double, Integer, Integer>>() {
-                    @Override
-                    public Tuple3<Double, Integer, Integer> call(Row t1) throws Exception {
-                        String category = t1.getAs(t1.fieldIndex(categoryColumnName));
-                        Double amount = t1.getAs("amount");
-                        Integer num_cat = 0;
-                        Integer num_indef = 0;
-
-                        if ("INDEFINIDO".equals(category)) {
-                            num_indef++;
-                                    
-                        } else {
-                            num_cat++;
-                        }
-
-                        return new Tuple3<>(amount, num_cat, num_indef);
-                    }
-                }).reduce(new Function2<Tuple3<Double,Integer,Integer>, Tuple3<Double,Integer,Integer>,Tuple3<Double,Integer,Integer>>(){
-                    @Override
-                    public Tuple3<Double, Integer, Integer> call(Tuple3<Double, Integer, Integer> t1, Tuple3<Double, Integer, Integer> t2) throws Exception {
-                        Double amountTotal = t1._1() + t2._1();
-                        Integer num_cat = t1._2() + t2._2();
-                        Integer num_indef = t1._3() + t2._3();
-                        
-                        return new Tuple3<>(amountTotal,num_cat,num_indef);
-                    }
-                });
-
-                System.out.println("Dados Pareto por valor financeiro: ");
-                System.out.println("Valor total: " + dados_pareto_amount._1()
-                + "\nTotal de registros categorizados: " + dados_pareto_amount._2()
-                + "\nTotal registros indefinidos: " + dados_pareto_amount._3());
-                
-                System.out.println("\nDados Pareto por quantidade: ");
-                System.out.println("Valor total: " + dados_pareto_count._1()
-                + "\nTotal de registros categorizados: " + dados_pareto_count._2()
-                + "\nTotal registros indefinidos: " + dados_pareto_count._3());
+//                Double num20perc_double = total_count_unicos * 0.2;
+//
+//                BigDecimal bd = new BigDecimal(num20perc_double);
+//                bd.setScale(1, RoundingMode.UP);
+//
+//                Double d = Math.ceil(bd.doubleValue());
+//
+//                Integer num20_perc = d.intValue();
+//
+//                DataFrame df_amount = finalDF.orderBy(desc("percentual_amount"))
+//                        .limit(num20_perc).withColumn("pareto_amount", lit(1));
+//
+//                DataFrame df_count = finalDF.orderBy(desc("percentual_count"))
+//                        .limit(num20_perc).withColumn("pareto_count", lit(1));
+//
+//                df_amount.write().format("org.apache.spark.sql.cassandra").options(mapOptions).mode(SaveMode.Append).save();
+//                df_count.write().format("org.apache.spark.sql.cassandra").options(mapOptions).mode(SaveMode.Append).save();
+//                
+//                Tuple3<Double, Integer, Integer> dados_pareto_amount = df_amount.javaRDD().map(new Function<Row, Tuple3<Double, Integer, Integer>>() {
+//                    @Override
+//                    public Tuple3<Double, Integer, Integer> call(Row t1) throws Exception {
+//                        String category = t1.getAs(t1.fieldIndex(categoryColumnName));
+//                        Double amount = t1.getAs("amount");
+//                        Integer num_cat = 0;
+//                        Integer num_indef = 0;
+//
+//                        if ("INDEFINIDO".equals(category)) {
+//                            num_indef++;
+//                                    
+//                        } else {
+//                            num_cat++;
+//                        }
+//
+//                        return new Tuple3<>(amount, num_cat, num_indef);
+//                    }
+//                }).reduce(new Function2<Tuple3<Double,Integer,Integer>, Tuple3<Double,Integer,Integer>,Tuple3<Double,Integer,Integer>>(){
+//                    @Override
+//                    public Tuple3<Double, Integer, Integer> call(Tuple3<Double, Integer, Integer> t1, Tuple3<Double, Integer, Integer> t2) throws Exception {
+//                        Double amountTotal = t1._1() + t2._1();
+//                        Integer num_cat = t1._2() + t2._2();
+//                        Integer num_indef = t1._3() + t2._3();
+//                        
+//                        return new Tuple3<>(amountTotal,num_cat,num_indef);
+//                    }
+//                });
+//
+//                Tuple3<Double, Integer, Integer> dados_pareto_count = df_count.javaRDD().map(new Function<Row, Tuple3<Double, Integer, Integer>>() {
+//                    @Override
+//                    public Tuple3<Double, Integer, Integer> call(Row t1) throws Exception {
+//                        String category = t1.getAs(t1.fieldIndex(categoryColumnName));
+//                        Double amount = t1.getAs("amount");
+//                        Integer num_cat = 0;
+//                        Integer num_indef = 0;
+//
+//                        if ("INDEFINIDO".equals(category)) {
+//                            num_indef++;
+//                                    
+//                        } else {
+//                            num_cat++;
+//                        }
+//
+//                        return new Tuple3<>(amount, num_cat, num_indef);
+//                    }
+//                }).reduce(new Function2<Tuple3<Double,Integer,Integer>, Tuple3<Double,Integer,Integer>,Tuple3<Double,Integer,Integer>>(){
+//                    @Override
+//                    public Tuple3<Double, Integer, Integer> call(Tuple3<Double, Integer, Integer> t1, Tuple3<Double, Integer, Integer> t2) throws Exception {
+//                        Double amountTotal = t1._1() + t2._1();
+//                        Integer num_cat = t1._2() + t2._2();
+//                        Integer num_indef = t1._3() + t2._3();
+//                        
+//                        return new Tuple3<>(amountTotal,num_cat,num_indef);
+//                    }
+//                });
+//
+//                System.out.println("Dados Pareto por valor financeiro: ");
+//                System.out.println("Valor total: " + dados_pareto_amount._1()
+//                + "\nTotal de registros categorizados: " + dados_pareto_amount._2()
+//                + "\nTotal registros indefinidos: " + dados_pareto_amount._3());
+//                
+//                System.out.println("\nDados Pareto por quantidade: ");
+//                System.out.println("Valor total: " + dados_pareto_count._1()
+//                + "\nTotal de registros categorizados: " + dados_pareto_count._2()
+//                + "\nTotal registros indefinidos: " + dados_pareto_count._3());
             }
 
         } else {
